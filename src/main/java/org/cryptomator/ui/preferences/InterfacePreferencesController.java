@@ -58,7 +58,7 @@ public class InterfacePreferencesController implements FxController {
 	public void initialize() {
 		themeChoiceBox.getItems().addAll(UiTheme.values());
 		if (!themeChoiceBox.getItems().contains(settings.theme.get())) {
-			settings.theme.set(UiTheme.LIGHT);
+			settings.theme.set(UiTheme.DARK);
 		}
 		themeChoiceBox.valueProperty().bindBidirectional(settings.theme);
 		themeChoiceBox.setConverter(new UiThemeConverter(resourceBundle));

@@ -15,7 +15,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextFormatter;
 import javafx.stage.Stage;
 
-
 @PreferencesScoped
 public class SupporterCertificateController implements FxController {
 
@@ -34,10 +33,10 @@ public class SupporterCertificateController implements FxController {
 
 	@Inject
 	SupporterCertificateController(Application application, //
-								   @PreferencesWindow Stage window,  //
-								   LicenseHolder licenseHolder, //
-								   Settings settings, //
-								   Dialogs dialogs) {
+			@PreferencesWindow Stage window, //
+			LicenseHolder licenseHolder, //
+			Settings settings, //
+			Dialogs dialogs) {
 		this.application = application;
 		this.window = window;
 		this.licenseHolder = licenseHolder;
@@ -65,11 +64,10 @@ public class SupporterCertificateController implements FxController {
 		return change;
 	}
 
-	private void registrationKeyChanged(@SuppressWarnings("unused") ObservableValue<? extends String> observable, @SuppressWarnings("unused") String oldValue, String newValue) {
+	private void registrationKeyChanged(@SuppressWarnings("unused") ObservableValue<? extends String> observable,
+			@SuppressWarnings("unused") String oldValue, String newValue) {
 		licenseHolder.validateAndStoreLicense(newValue);
-		if (!licenseHolder.isValidLicense()) {
-			settings.theme.set(UiTheme.LIGHT);
-		}
+		settings.theme.set(UiTheme.DARK);
 	}
 
 	@FXML

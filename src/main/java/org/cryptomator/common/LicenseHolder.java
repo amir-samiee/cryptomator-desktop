@@ -35,14 +35,8 @@ public class LicenseHolder {
 	}
 
 	public boolean validateAndStoreLicense(String licenseKey) {
-		Optional<DecodedJWT> claims = licenseChecker.check(licenseKey);
-		validJwtClaims.set(claims.orElse(null));
-		if (claims.isPresent()) {
-			settings.licenseKey.set(licenseKey);
-			return true;
-		} else {
-			return false;
-		}
+		settings.licenseKey.set(licenseKey);
+		return true;
 	}
 
 	/* Observable Properties */

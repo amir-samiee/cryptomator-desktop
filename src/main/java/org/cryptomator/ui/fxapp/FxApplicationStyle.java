@@ -26,10 +26,11 @@ public class FxApplicationStyle {
 	private final Optional<UiAppearanceProvider> appearanceProvider;
 	private final LicenseHolder licenseHolder;
 	private final UiAppearanceListener systemInterfaceThemeListener = this::systemInterfaceThemeChanged;
-	private final ObjectProperty<Theme> appliedTheme = new SimpleObjectProperty<>(Theme.LIGHT);
+	private final ObjectProperty<Theme> appliedTheme = new SimpleObjectProperty<>(Theme.DARK);
 
 	@Inject
-	public FxApplicationStyle(Settings settings, Optional<UiAppearanceProvider> appearanceProvider, LicenseHolder licenseHolder) {
+	public FxApplicationStyle(Settings settings, Optional<UiAppearanceProvider> appearanceProvider,
+			LicenseHolder licenseHolder) {
 		this.settings = settings;
 		this.appearanceProvider = appearanceProvider;
 		this.licenseHolder = licenseHolder;
@@ -44,7 +45,8 @@ public class FxApplicationStyle {
 		settings.theme.addListener(this::appThemeChanged);
 	}
 
-	private void appThemeChanged(@SuppressWarnings("unused") ObservableValue<? extends UiTheme> observable, UiTheme oldValue, UiTheme newValue) {
+	private void appThemeChanged(@SuppressWarnings("unused") ObservableValue<? extends UiTheme> observable,
+			UiTheme oldValue, UiTheme newValue) {
 		if (oldValue == newValue) {
 			// no-op
 		} else if (newValue == UiTheme.AUTOMATIC) {
@@ -81,17 +83,13 @@ public class FxApplicationStyle {
 	}
 
 	private void applyTheme(UiTheme uiTheme) {
-		if (!licenseHolder.isValidLicense()) {
-			loadAndApplyLightTheme();
-		} else {
-			switch (uiTheme) {
-				case AUTOMATIC -> {
-					var osTheme = appearanceProvider.map(UiAppearanceProvider::getSystemTheme).orElse(Theme.LIGHT);
-					systemInterfaceThemeChanged(osTheme);
-				}
-				case LIGHT -> loadAndApplyLightTheme();
-				case DARK -> loadAndApplyDarkTheme();
+		switch (uiTheme) {
+			case AUTOMATIC -> {
+				var osTheme = appearanceProvider.map(UiAppearanceProvider::getSystemTheme).orElse(Theme.DARK);
+				systemInterfaceThemeChanged(osTheme);
 			}
+			case LIGHT -> loadAndApplyLightTheme();
+			case DARK -> loadAndApplyDarkTheme();
 		}
 	}
 
