@@ -320,13 +320,13 @@ jobs:
           echo "value=${CMD_OUTPUT[0]}" >> $GITHUB_OUTPUT
       - name: Add possible alpha/beta tags and architecture to installer name
         run: mv installer/Cryptomator-*.msi "Cryptomator-${VERSION_NUM}${VERSION_SUFFIX}-${{ matrix.arch }}.msi"
-      - name: Create detached GPG signature with key 615D449FE6E6A235
-        run: |
-          echo "${GPG_PRIVATE_KEY}" | gpg --batch --quiet --import
-          echo "${GPG_PASSPHRASE}" | gpg --batch --quiet --passphrase-fd 0 --pinentry-mode loopback -u 615D449FE6E6A235 --detach-sign -a Cryptomator-*.msi
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.RELEASES_GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.RELEASES_GPG_PASSPHRASE }}
+      # - name: Create detached GPG signature with key 615D449FE6E6A235
+      #   run: |
+      #     echo "${GPG_PRIVATE_KEY}" | gpg --batch --quiet --import
+      #     echo "${GPG_PASSPHRASE}" | gpg --batch --quiet --passphrase-fd 0 --pinentry-mode loopback -u 615D449FE6E6A235 --detach-sign -a Cryptomator-*.msi
+      #   env:
+      #     GPG_PRIVATE_KEY: ${{ secrets.RELEASES_GPG_PRIVATE_KEY }}
+      #     GPG_PASSPHRASE: ${{ secrets.RELEASES_GPG_PASSPHRASE }}
       - name: Upload artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
@@ -453,13 +453,13 @@ jobs:
           echo "value=${CMD_OUTPUT[0]}" >> $GITHUB_OUTPUT
       - name: Add possible alpha/beta tags to installer name
         run: mv installer/Cryptomator-Installer.exe "Cryptomator-${VERSION_NUM}${VERSION_SUFFIX}-${{ matrix.executable-suffix }}.exe"
-      - name: Create detached GPG signature with key 615D449FE6E6A235
-        run: |
-          echo "${GPG_PRIVATE_KEY}" | gpg --batch --quiet --import
-          echo "${GPG_PASSPHRASE}" | gpg --batch --quiet --passphrase-fd 0 --pinentry-mode loopback -u 615D449FE6E6A235 --detach-sign -a Cryptomator-*.exe
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.RELEASES_GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.RELEASES_GPG_PASSPHRASE }}
+      # - name: Create detached GPG signature with key 615D449FE6E6A235
+      #   run: |
+      #     echo "${GPG_PRIVATE_KEY}" | gpg --batch --quiet --import
+      #     echo "${GPG_PASSPHRASE}" | gpg --batch --quiet --passphrase-fd 0 --pinentry-mode loopback -u 615D449FE6E6A235 --detach-sign -a Cryptomator-*.exe
+      #   env:
+      #     GPG_PRIVATE_KEY: ${{ secrets.RELEASES_GPG_PRIVATE_KEY }}
+      #     GPG_PASSPHRASE: ${{ secrets.RELEASES_GPG_PASSPHRASE }}
       - name: Upload artifacts
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
