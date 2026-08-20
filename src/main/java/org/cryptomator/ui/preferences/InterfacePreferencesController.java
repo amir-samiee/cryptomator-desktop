@@ -44,7 +44,9 @@ public class InterfacePreferencesController implements FxController {
 	public RadioButton nodeOrientationRtl;
 
 	@Inject
-	InterfacePreferencesController(Settings settings, SupportedLanguages supportedLanguages, TrayMenuComponent trayMenu, ObjectProperty<SelectedPreferencesTab> selectedTabProperty, LicenseHolder licenseHolder, ResourceBundle resourceBundle) {
+	InterfacePreferencesController(Settings settings, SupportedLanguages supportedLanguages, TrayMenuComponent trayMenu,
+			ObjectProperty<SelectedPreferencesTab> selectedTabProperty, LicenseHolder licenseHolder,
+			ResourceBundle resourceBundle) {
 		this.settings = settings;
 		this.trayMenuInitialized = trayMenu.isInitialized();
 		this.trayMenuSupported = trayMenu.isSupported();
@@ -57,9 +59,7 @@ public class InterfacePreferencesController implements FxController {
 	@FXML
 	public void initialize() {
 		themeChoiceBox.getItems().addAll(UiTheme.values());
-		if (!themeChoiceBox.getItems().contains(settings.theme.get())) {
-			settings.theme.set(UiTheme.DARK);
-		}
+		settings.theme.set(UiTheme.DARK);
 		themeChoiceBox.valueProperty().bindBidirectional(settings.theme);
 		themeChoiceBox.setConverter(new UiThemeConverter(resourceBundle));
 
@@ -75,7 +75,6 @@ public class InterfacePreferencesController implements FxController {
 		nodeOrientation.selectedToggleProperty().addListener(this::toggleNodeOrientation);
 	}
 
-
 	public boolean isTrayMenuInitialized() {
 		return trayMenuInitialized;
 	}
@@ -84,7 +83,8 @@ public class InterfacePreferencesController implements FxController {
 		return trayMenuSupported;
 	}
 
-	private void toggleNodeOrientation(@SuppressWarnings("unused") ObservableValue<? extends Toggle> observable, @SuppressWarnings("unused") Toggle oldValue, Toggle newValue) {
+	private void toggleNodeOrientation(@SuppressWarnings("unused") ObservableValue<? extends Toggle> observable,
+			@SuppressWarnings("unused") Toggle oldValue, Toggle newValue) {
 		if (nodeOrientationLtr.equals(newValue)) {
 			settings.userInterfaceOrientation.set(NodeOrientation.LEFT_TO_RIGHT);
 		} else if (nodeOrientationRtl.equals(newValue)) {
@@ -97,7 +97,6 @@ public class InterfacePreferencesController implements FxController {
 	public LicenseHolder getLicenseHolder() {
 		return licenseHolder;
 	}
-
 
 	@FXML
 	public void showContributeTab() {
