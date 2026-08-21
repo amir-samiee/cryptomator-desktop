@@ -124,12 +124,12 @@ jobs:
           wix.exe extension add --global WixToolset.Util.wixext/${WIX_VERSION}
         env:
           WIX_VERSION: ${{ env.WIX_VERSION }}
-      - name: Cache JavaFX jmods
-        uses: actions/cache@0c457735329be4798b959f948510d1a55933c428 # v4.0.2
-        id: cache-jfx-jmods
-        with:
-          path: openjfx-jmods
-          key: jfx-jmods-${{ env.OPENJFX_JMODS_AMD64_HASH }}
+      # - name: Cache JavaFX jmods
+      #   uses: actions/cache@0c457735329be4798b959f948510d1a55933c428 # v4.0.2
+      #   id: cache-jfx-jmods
+      #   with:
+      #     path: openjfx-jmods
+      #     key: jfx-jmods-${{ env.OPENJFX_JMODS_AMD64_HASH }}
       - name: Download and extract JavaFX jmods from Gluon
         if: matrix.arch == 'x64'
         #In the last step we move all jmods files a dir level up because jmods are placed inside a directory in the zip
@@ -414,14 +414,14 @@ jobs:
           "-Dlicense.failOnMissing=true"
           "-Dlicense.licenseMergesUrl=file:///${{ github.workspace }}/license/merges"
         shell: pwsh
-      - name: Cache WinFSP files
-        uses: actions/cache@0c457735329be4798b959f948510d1a55933c428 # v4.0.2
-        id: cache-winfsp
-        with:
-          path: |
-            dist/win/bundle/resources/winfsp.msi
-            dist/win/bundle/resources/winfsp-uninstaller.exe
-          key: winfsp-${{ env.WINFSP_MSI_HASH }}
+      # - name: Cache WinFSP files
+      #   uses: actions/cache@0c457735329be4798b959f948510d1a55933c428 # v4.0.2
+      #   id: cache-winfsp
+      #   with:
+      #     path: |
+      #       dist/win/bundle/resources/winfsp.msi
+      #       dist/win/bundle/resources/winfsp-uninstaller.exe
+      #     key: winfsp-${{ env.WINFSP_MSI_HASH }}
       - name: Download WinFsp
         run: |
           curl --silent --fail-with-body --proto "=https" -L "$env:WINFSP_MSI" --output $env:WINFSP_PATH
