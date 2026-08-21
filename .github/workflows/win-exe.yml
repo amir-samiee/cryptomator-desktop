@@ -1,24 +1,22 @@
 name: Build Windows Installer
 
 on:
-  schedule:
-    - cron: '0 19 20 * *'
   workflow_call:
     inputs:
       semVerNum:
         type: string
-        description: 'The Major.Minor.Patch part of the version'
+        description: "The Major.Minor.Patch part of the version"
         required: true
       revisionNum:
         type: string
-        description: 'The revision number'
+        description: "The revision number"
         required: true
       semVerSuffix:
         type: string
-        description: 'The suffix of the version, including dash'
+        description: "The suffix of the version, including dash"
         required: true
       sign:
-        description: 'Sign binaries'
+        description: "Sign binaries"
         default: true
         type: boolean
       upload-to-draft:
@@ -34,47 +32,71 @@ on:
   workflow_dispatch:
     inputs:
       semVerNum:
-        description: 'The Major.Minor.Patch part of the version'
+        description: "The Major.Minor.Patch part of the version"
         required: false
       revisionNum:
-        description: 'The revision number'
+        description: "The revision number"
         required: false
       semVerSuffix:
-        description: 'The suffix of the version, including dash'
+        description: "The suffix of the version, including dash"
         required: false
-        default: '-SNAPSHOT'
+        default: "-SNAPSHOT"
       sign:
-        description: 'Sign binaries'
+        description: "Sign binaries"
         required: false
         type: boolean
         default: false
   push:
     branches-ignore:
-      - 'dependabot/**'
+      - "dependabot/**"
     paths:
-      - '.github/workflows/win-exe.yml'
-      - 'dist/win/**'
-
+      - ".github/workflows/win-exe.yml"
+      - "dist/win/**"
 
 env:
   VERSION_NUM: ${{ inputs.semVerNum || '99.99.99'}}
   REVISION_NUM: ${{ inputs.revisionNum || '0' }}
   VERSION_SUFFIX: ${{ inputs.semVerSuffix || ''}}
-  OPENJFX_JMODS_AMD64: 'https://download2.gluonhq.com/openjfx/25.0.3/openjfx-25.0.3_windows-x64_bin-jmods.zip'
-  OPENJFX_JMODS_AMD64_HASH: '0bf9b83260b85607a9ba200124debabd9cdb013cbc0d659e62a20192a7137907'
-  WINFSP_MSI: 'https://github.com/winfsp/winfsp/releases/download/v2.1/winfsp-2.1.25156.msi'
-  WINFSP_MSI_HASH: '073a70e00f77423e34bed98b86e600def93393ba5822204fac57a29324db9f7a'
-  WINFSP_UNINSTALLER: 'https://github.com/cryptomator/winfsp-uninstaller/releases/latest/download/winfsp-uninstaller.exe'
-  WIX_VERSION: '6.0.2'
+  OPENJFX_JMODS_AMD64: "https://download2.gluonhq.com/openjfx/25.0.3/openjfx-25.0.3_windows-x64_bin-jmods.zip"
+  OPENJFX_JMODS_AMD64_HASH: "0bf9b83260b85607a9ba200124debabd9cdb013cbc0d659e62a20192a7137907"
+  WINFSP_MSI: "https://github.com/winfsp/winfsp/releases/download/v2.1/winfsp-2.1.25156.msi"
+  WINFSP_MSI_HASH: "073a70e00f77423e34bed98b86e600def93393ba5822204fac57a29324db9f7a"
+  WINFSP_UNINSTALLER: "https://github.com/cryptomator/winfsp-uninstaller/releases/latest/download/winfsp-uninstaller.exe"
+  WIX_VERSION: "6.0.2"
 
 defaults:
   run:
     shell: bash
 
 jobs:
+  should-run:
+    name: Check whether the workflow should run
+    runs-on: ubuntu-latest
+
+    # This job always starts, but decides whether the rest should run.
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+
+    steps:
+      - id: check
+        shell: bash
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+        run: |
+          if [[ "$EVENT_NAME" != "push" ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          elif [[ "$COMMIT_MESSAGE" == *"[exe]"* ]]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "run=false" >> "$GITHUB_OUTPUT"
+          fi
+
   build-msi:
     name: Build .msi Installer
     runs-on: ${{ matrix.os }}
+    needs: [should-run]
+    if: needs.should-run.outputs.run == 'true'
     outputs:
       sha256sum: ${{ steps.sha256sum.outputs.value }}
     strategy:
@@ -82,9 +104,9 @@ jobs:
         include:
           - arch: x64
             os: windows-latest
-            java-dist: 'temurin'
-            java-version: '26.0.1+8'
-            java-package: 'jdk'
+            java-dist: "temurin"
+            java-version: "26.0.1+8"
+            java-package: "jdk"
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Setup Java
@@ -94,7 +116,7 @@ jobs:
           java-version: ${{ matrix.java-version }}
           java-package: ${{ matrix.java-package }}
           check-latest: true
-          cache: 'maven'
+          cache: "maven"
       - name: Install wix and extensions
         run: |
           dotnet tool install --global wix --version ${WIX_VERSION}
@@ -102,6 +124,12 @@ jobs:
           wix.exe extension add --global WixToolset.Util.wixext/${WIX_VERSION}
         env:
           WIX_VERSION: ${{ env.WIX_VERSION }}
+      - name: Cache JavaFX jmods
+        uses: actions/cache@0c457735329be4798b959f948510d1a55933c428 # v4.0.2
+        id: cache-jfx-jmods
+        with:
+          path: openjfx-jmods
+          key: jfx-jmods-${{ env.OPENJFX_JMODS_AMD64_HASH }}
       - name: Download and extract JavaFX jmods from Gluon
         if: matrix.arch == 'x64'
         #In the last step we move all jmods files a dir level up because jmods are placed inside a directory in the zip
@@ -229,7 +257,7 @@ jobs:
         uses: ./.github/actions/win-sign-action
         with:
           base-dir: ${{ github.workspace }}\appdir
-          file-extensions: 'exe,dll'
+          file-extensions: "exe,dll"
           recursive: true
           append-signature: true
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
@@ -240,9 +268,9 @@ jobs:
         uses: ./.github/actions/win-sign-action
         with:
           base-dir: ${{ github.workspace }}\appdir\Cryptomator
-          file-extensions: 'ps1'
+          file-extensions: "ps1"
           recursive: false
-          append-signature: false  # Powershell scripts cannot be signed in append mode, see #4260
+          append-signature: false # Powershell scripts cannot be signed in append mode, see #4260
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -310,7 +338,7 @@ jobs:
         with:
           base-dir: ${{ github.workspace }}\installer
           file-extensions: msi
-          description: 'Cryptomator Installer'
+          description: "Cryptomator Installer"
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -339,7 +367,7 @@ jobs:
   build-exe:
     name: Build .exe installer
     runs-on: ${{ matrix.os }}
-    needs: [ build-msi ]
+    needs: [build-msi]
     outputs:
       sha256sum: ${{ steps.sha256sum.outputs.value }}
     strategy:
@@ -348,9 +376,9 @@ jobs:
           - arch: x64
             os: windows-latest
             executable-suffix: x64
-            java-dist: 'temurin'
-            java-version: '26.0.1+8'
-            java-package: 'jdk'
+            java-dist: "temurin"
+            java-version: "26.0.1+8"
+            java-package: "jdk"
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
       - name: Install wix and extensions
@@ -374,7 +402,7 @@ jobs:
           java-version: ${{ matrix.java-version }}
           java-package: ${{ matrix.java-package }}
           check-latest: true
-          cache: 'maven'
+          cache: "maven"
       - name: Generate license for exe
         run: >
           ./mvnw -B license:add-third-party
@@ -386,6 +414,14 @@ jobs:
           "-Dlicense.failOnMissing=true"
           "-Dlicense.licenseMergesUrl=file:///${{ github.workspace }}/license/merges"
         shell: pwsh
+      - name: Cache WinFSP files
+        uses: actions/cache@0c457735329be4798b959f948510d1a55933c428 # v4.0.2
+        id: cache-winfsp
+        with:
+          path: |
+            dist/win/bundle/resources/winfsp.msi
+            dist/win/bundle/resources/winfsp-uninstaller.exe
+          key: winfsp-${{ env.WINFSP_MSI_HASH }}
       - name: Download WinFsp
         run: |
           curl --silent --fail-with-body --proto "=https" -L "$env:WINFSP_MSI" --output $env:WINFSP_PATH
@@ -394,7 +430,7 @@ jobs:
             throw "Checksum mismatch for ${env:WINFSP_PATH} (expected ${env:WINFSP_MSI_HASH}, got $computedHash)."
           }
         env:
-          WINFSP_PATH: 'dist/win/bundle/resources/winfsp.msi'
+          WINFSP_PATH: "dist/win/bundle/resources/winfsp.msi"
         shell: pwsh
       - name: Download Legacy-WinFsp uninstaller
         run: |
@@ -426,7 +462,7 @@ jobs:
           base-dir: ${{ github.workspace }}\tmp
           file-extensions: exe
           append-signature: true
-          description: 'Cryptomator Bundle Installer'
+          description: "Cryptomator Bundle Installer"
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -443,7 +479,7 @@ jobs:
           base-dir: ${{ github.workspace }}\installer
           file-extensions: exe
           append-signature: true
-          description: 'Cryptomator Bundle Installer'
+          description: "Cryptomator Bundle Installer"
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           client-id: ${{ secrets.AZURE_CLIENT_ID }}
           client-secret: ${{ secrets.AZURE_CLIENT_SECRET }}
@@ -473,7 +509,7 @@ jobs:
     name: Publish installers to the github release
     if: inputs.upload-to-draft
     runs-on: ubuntu-latest
-    needs: [ build-msi, build-exe ]
+    needs: [build-msi, build-exe]
     steps:
       - name: Download installers
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
