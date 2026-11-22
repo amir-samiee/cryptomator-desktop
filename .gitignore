@@ -1,6 +1,7 @@
 *.class
 
 # Package Files #
+strings_*.properties
 *.jar
 *.war
 *.ear

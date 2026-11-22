@@ -55,18 +55,18 @@ on:
       semVerSuffix:
         description: "The suffix of the version, including dash"
         required: false
-        default: "-SNAPSHOT"
+        default: ""
       sign:
         description: "Sign binaries"
         required: false
         type: boolean
         default: false
-  push:
-    branches-ignore:
-      - "dependabot/**"
-    paths:
-      - ".github/workflows/win-exe.yml"
-      - "dist/win/**"
+  # push:
+  #   branches-ignore:
+  #     - "dependabot/**"
+  #   paths:
+  #     - ".github/workflows/win-exe.yml"
+  #     - "dist/win/**"
 
 env:
   VERSION_NUM: ${{ inputs.semVerNum || '99.99.99'}}

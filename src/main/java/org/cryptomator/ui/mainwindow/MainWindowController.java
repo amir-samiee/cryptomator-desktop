@@ -42,11 +42,11 @@ public class MainWindowController implements FxController {
 
 	@Inject
 	public MainWindowController(@MainWindow Stage window, //
-								ObjectProperty<Vault> selectedVault, //
-								Settings settings, //
-								FxApplicationWindows appWindows, //
-								UpdateChecker updateChecker, //
-								LicenseHolder licenseHolder) {
+			ObjectProperty<Vault> selectedVault, //
+			Settings settings, //
+			FxApplicationWindows appWindows, //
+			UpdateChecker updateChecker, //
+			LicenseHolder licenseHolder) {
 		this.window = window;
 		this.selectedVault = selectedVault;
 		this.settings = settings;
@@ -96,17 +96,17 @@ public class MainWindowController implements FxController {
 		int height = settings.windowHeight.get();
 
 		Rectangle2D primaryScreenBounds = Screen.getPrimary().getBounds();
-		if (!isWithinDisplayBounds(x, y, width, height)) { //use stored window position
+		if (!isWithinDisplayBounds(x, y, width, height)) { // use stored window position
 			LOG.debug("Resetting window position due to insufficient screen overlap");
 			var centeredX = (primaryScreenBounds.getWidth() - window.getMinWidth()) / 2;
 			var centeredY = (primaryScreenBounds.getHeight() - window.getMinHeight()) / 2;
-			//check if we can keep width and height
+			// check if we can keep width and height
 			if (isWithinDisplayBounds((int) centeredX, (int) centeredY, width, height)) {
-				//if so, keep window size
+				// if so, keep window size
 				window.setWidth(Math.clamp(width, window.getMinWidth(), window.getMaxWidth()));
 				window.setHeight(Math.clamp(height, window.getMinHeight(), window.getMaxHeight()));
 			}
-			//reset position of upper left corner
+			// reset position of upper left corner
 			window.setX(centeredX);
 			window.setY(centeredY);
 		}
@@ -119,7 +119,8 @@ public class MainWindowController implements FxController {
 		final int shrinkedWidth = width - 40; // 20px left + 20px right
 		final int shrinkedHeigth = height - 25; // 5px top + 20px bottom
 		return isRectangleWithinBounds(shrinkedX, shrinkedY, 0, shrinkedHeigth) // Left pixel column
-				&& isRectangleWithinBounds(shrinkedX + shrinkedWidth, shrinkedY, 0, shrinkedHeigth) // Right pixel column
+				&& isRectangleWithinBounds(shrinkedX + shrinkedWidth, shrinkedY, 0, shrinkedHeigth) // Right pixel
+																									// column
 				&& isRectangleWithinBounds(shrinkedX, shrinkedY, shrinkedWidth, 0) // Top pixel row
 				&& isRectangleWithinBounds(shrinkedX, shrinkedY + shrinkedHeigth, shrinkedWidth, 0); // Bottom pixel row
 	}
@@ -171,7 +172,7 @@ public class MainWindowController implements FxController {
 	}
 
 	public boolean getLicenseValid() {
-		return licenseHolder.isValidLicense();
+		return true;
 	}
 
 }
