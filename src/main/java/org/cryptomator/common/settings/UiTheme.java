@@ -6,8 +6,9 @@ import org.apache.commons.lang3.SystemUtils;
 
 @JsonFormat(shape = JsonFormat.Shape.STRING)
 public enum UiTheme {
-	@JsonEnumDefaultValue LIGHT("preferences.interface.theme.light"), //
+	@JsonEnumDefaultValue 
 	DARK("preferences.interface.theme.dark"), //
+	LIGHT("preferences.interface.theme.light"), //
 	AUTOMATIC("preferences.interface.theme.automatic");
 
 	private final String displayName;
