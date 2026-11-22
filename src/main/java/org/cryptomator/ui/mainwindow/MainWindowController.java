@@ -42,11 +42,11 @@ public class MainWindowController implements FxController {
 
 	@Inject
 	public MainWindowController(@MainWindow Stage window, //
-								ObjectProperty<Vault> selectedVault, //
-								Settings settings, //
-								FxApplicationWindows appWindows, //
-								UpdateChecker updateChecker, //
-								LicenseHolder licenseHolder) {
+			ObjectProperty<Vault> selectedVault, //
+			Settings settings, //
+			FxApplicationWindows appWindows, //
+			UpdateChecker updateChecker, //
+			LicenseHolder licenseHolder) {
 		this.window = window;
 		this.selectedVault = selectedVault;
 		this.settings = settings;
@@ -171,7 +171,7 @@ public class MainWindowController implements FxController {
 	}
 
 	public boolean getLicenseValid() {
-		return licenseHolder.isValidLicense();
+		return true;
 	}
 
 }

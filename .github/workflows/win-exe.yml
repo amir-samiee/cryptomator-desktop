@@ -1,8 +1,6 @@
 name: Build Windows Installer
 
 on:
-  schedule:
-    - cron: '0 19 20 * *'
   workflow_call:
     inputs:
       semVerNum:
@@ -57,20 +55,12 @@ on:
       semVerSuffix:
         description: 'The suffix of the version, including dash'
         required: false
-        default: '-SNAPSHOT'
+        default: ''
       sign:
         description: 'Sign binaries'
         required: false
         type: boolean
         default: false
-  push:
-    branches-ignore:
-      - 'dependabot/**'
-    paths:
-      - '.github/workflows/win-exe.yml'
-      - 'dist/win/**'
-      - 'dist/common/**'
-
 
 env:
   VERSION_NUM: ${{ inputs.semVerNum || '99.99.99'}}
@@ -374,13 +364,6 @@ jobs:
           echo "value=${CMD_OUTPUT[0]}" >> $GITHUB_OUTPUT
       - name: Add possible alpha/beta tags and architecture to installer name
         run: mv installer/Cryptomator-*.msi "Cryptomator-${VERSION_NUM}${VERSION_SUFFIX}-${{ matrix.arch }}.msi"
-      - name: Create detached GPG signature with key 615D449FE6E6A235
-        run: |
-          echo "${GPG_PRIVATE_KEY}" | gpg --batch --quiet --import
-          echo "${GPG_PASSPHRASE}" | gpg --batch --quiet --passphrase-fd 0 --pinentry-mode loopback -u 615D449FE6E6A235 --detach-sign -a Cryptomator-*.msi
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.RELEASES_GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.RELEASES_GPG_PASSPHRASE }}
       - name: Upload artifacts
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
@@ -517,13 +500,6 @@ jobs:
           echo "value=${CMD_OUTPUT[0]}" >> $GITHUB_OUTPUT
       - name: Add possible alpha/beta tags to installer name
         run: mv installer/Cryptomator-Installer.exe "Cryptomator-${VERSION_NUM}${VERSION_SUFFIX}-${{ matrix.executable-suffix }}.exe"
-      - name: Create detached GPG signature with key 615D449FE6E6A235
-        run: |
-          echo "${GPG_PRIVATE_KEY}" | gpg --batch --quiet --import
-          echo "${GPG_PASSPHRASE}" | gpg --batch --quiet --passphrase-fd 0 --pinentry-mode loopback -u 615D449FE6E6A235 --detach-sign -a Cryptomator-*.exe
-        env:
-          GPG_PRIVATE_KEY: ${{ secrets.RELEASES_GPG_PRIVATE_KEY }}
-          GPG_PASSPHRASE: ${{ secrets.RELEASES_GPG_PASSPHRASE }}
       - name: Upload artifacts
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
